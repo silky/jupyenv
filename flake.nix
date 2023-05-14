@@ -64,9 +64,7 @@
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
 
-        python = pkgs.python3;
-        poetry2nixPkgs = import "${poetry2nix}/default.nix" {inherit pkgs poetry;};
-        poetry = pkgs.callPackage "${poetry2nix}/pkgs/poetry" {inherit python;};
+        poetry2nixPkgs = import "${poetry2nix}/default.nix" {inherit pkgs;};
 
         baseArgs = {
           inherit self system;
@@ -92,7 +90,7 @@
           pkgs.writeShellApplication
           {
             name = "update-poetry-lock";
-            runtimeInputs = [poetry];
+            runtimeInputs = [pkgs.poetry];
             text = ''
               shopt -s globstar
               for lock in **/poetry.lock; do
@@ -106,7 +104,8 @@
           };
 
         jupyenvLib = lib.makeScope lib.callPackageWith (final: {
-          inherit self system pkgs lib python nix-dart baseArgs kernelLib;
+          python = pkgs.python3;
+          inherit self system pkgs lib nix-dart baseArgs kernelLib;
           docsLib = final.callPackage ./lib/docs.nix {};
           jupyterLib = final.callPackage ./lib/jupyter.nix {};
         });
@@ -147,7 +146,7 @@
             pkgs.alejandra
             pkgs.typos
             poetry2nixPkgs.cli
-            poetry
+            pkgs.poetry
             pkgs.rnix-lsp
             self.packages."${system}".update-poetry-lock
             docsLib.mkdocs

@@ -46,9 +46,10 @@
             ignoreCollisions
             ;
           pkgs = config.nixpkgs;
-          python = pkgs.${config.python};
-          poetry = pkgs.callPackage "${config.poetry2nix}/pkgs/poetry" {inherit python;};
-          poetry2nix = import "${config.poetry2nix}/default.nix" {inherit pkgs poetry;};
+          # TODO: Wrong.
+          # python = pkgs.${config.python};
+          # poetry = pkgs.callPackage "${config.poetry2nix}/pkgs/poetry" {inherit python;};
+          poetry2nix = import "${config.poetry2nix}/default.nix" {inherit pkgs;};
           overrides =
             if config.withDefaultOverrides == true
             then poetry2nix.overrides.withDefaults (import config.overrides)
